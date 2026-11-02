@@ -64,4 +64,8 @@
 ## 6. 验证记录
 
 - 本地（Linux，Node 22.23.2）：`yarn workspace dsh-plugin-desktop build` 通过；产物扫描 `@scope`=0、`oklch(`=0、`color-mix()` 均带静态回退。
-- GitHub Actions：见本分支 CI run（`Windows 7 SP1 build` workflow）的 artifact 与 `win7-verification.json`。
+- 构建成功 run（分支推送）：<https://github.com/kouhj/dsh-desktop/actions/runs/41444207411>
+- 发布 run 与产物（tag `win7-v2.0.18`）：<https://github.com/kouhj/dsh-desktop/releases/tag/win7-v2.0.18>
+  - `DSH-Desktop-2.0.18-x64-Setup.exe`（NSIS 安装包，含离线 runtime）
+  - `DSH-Desktop-2.0.18-x64-Portable.zip`
+  - `win7-verification.json`（12 项产物闸门全部 PASS：PE 子系统 5.2、Electron 22.3.x 资源串、离线 runtime、CSS 降级、boot polyfill）

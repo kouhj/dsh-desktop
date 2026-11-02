@@ -148,19 +148,28 @@ jobs:
         run: |
           $exe = 'dsh-plugin-desktop/dist/win-unpacked/DSH Desktop.exe'
           $entry = 'dsh-plugin-desktop/dist/win-unpacked/resources/app/lib/main.js'
-          $env:ELECTRON_RUN_AS_NODE = '1'
-          $output = & $exe $entry 2>&1 | Out-String
-          $exit = $LASTEXITCODE
-          $env:ELECTRON_RUN_AS_NODE = $null
-          @"
+          $exitCode = 'not-run'
+          $detail = ''
+          try {
+            $env:ELECTRON_RUN_AS_NODE = '1'
+            $detail = (& $exe $entry 2>&1 | Out-String).Trim()
+            $exitCode = $LASTEXITCODE
+          } catch {
+            $exitCode = "launch-failed: $($_.Exception.Message)"
+          } finally {
+            Remove-Item Env:\ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue
+          }
+          $markdown = @"
           ### Windows 7 runtime probe (evidence, not a pass/fail gate)
 
-          `- Electron 22 entry probe exit code: $exit
+          `- Electron 22 entry probe exit code: $exitCode
           `- First output lines:
           ```
-          $($output.Trim() | Select-Object -First 20 | Out-String)
+          $($detail.Substring(0, [Math]::Min(1500, $detail.Length)))
           ```
-          "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "@
+          $markdown | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          exit 0
 
       - name: Upload Windows 7 artifacts
         uses: actions/upload-artifact@v4
