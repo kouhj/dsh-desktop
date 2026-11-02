@@ -66,8 +66,8 @@
 ## 6. 验证记录
 
 - 本地（Linux，Node 22.23.2）：`yarn workspace dsh-plugin-desktop build` 通过；产物扫描 `@scope`=0、`oklch(`=0、`color-mix()` 均带静态回退。
-- 构建成功 run（分支推送）：<https://github.com/kouhj/dsh-desktop/actions/runs/41444207411>
-- 发布 run 与产物（tag `win7-v2.0.18`）：<https://github.com/kouhj/dsh-desktop/releases/tag/win7-v2.0.18>
-  - `DSH-Desktop-2.0.18-x64-Setup.exe`（NSIS 安装包，含离线 runtime）
-  - `DSH-Desktop-2.0.18-x64-Portable.zip`
-  - `win7-verification.json`（产物闸门全部 PASS：PE 子系统 5.2、Electron 22.3.x 资源串、Win10-only runtime 未打包、CSS 降级、boot polyfill）
+- shell-only 渠道构建 run（`windows-latest`）：<https://github.com/kouhj/dsh-desktop/actions/runs/41447436454>
+- 发布 run 与产物（tag `win7-v2.0.18`）：<https://github.com/kouhj/dsh-desktop/actions/runs/41448204046> / <https://github.com/kouhj/dsh-desktop/releases/tag/win7-v2.0.18>
+  - `DSH-Desktop-2.0.18-x64-Setup.exe`（NSIS 安装包，815MB；x64-only、不含 Win10-only runtime）
+  - `DSH-Desktop-2.0.18-x64-Portable.zip`（821MB）
+  - `win7-verification.json`（14 项产物闸门全部 PASS：PE 子系统 5.2、Electron 22.3.x 资源串、Win10-only Node/Python runtime 未打包、CSS 降级、boot polyfill）
