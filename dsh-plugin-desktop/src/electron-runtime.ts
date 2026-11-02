@@ -8,6 +8,7 @@ import {
   Notification,
   shell,
 } from 'electron'
+import { netFetchCompat } from './electron-compat.ts'
 import { configureDeveloperLogging, type DiagnosticPreferences } from './developer-logging.ts'
 import { spawn } from 'node:child_process'
 import { NextTransitionNotice } from './next-transition-notice.ts'
@@ -240,7 +241,7 @@ export class ElectronDesktopRuntime implements DesktopRuntime {
       get releaseChannel() { return DESKTOP_RELEASE_CHANNEL },
       get statePath() { return join(app.getPath('userData'), 'updates', 'state.json') },
       ...(installationId === undefined ? {} : { installationId }),
-      request: (url, init) => net.fetch(url, init),
+      request: (url, init) => netFetchCompat(url, init) as unknown as Promise<Response>,
       confirmDownload: (version, channel) => this.confirmUpdateDownload(version, channel),
       showManualCheckResult: result => this.showManualUpdateCheckResult(result),
       downloadAndOpen: (version, signal, channel, installerSha256) => this.downloadAndOpenUpdate(version, signal, channel, installerSha256),

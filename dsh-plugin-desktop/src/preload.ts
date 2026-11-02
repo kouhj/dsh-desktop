@@ -1,6 +1,6 @@
 /** Minimal context-isolated bridges for drag payloads, Desktop-owned actions, and the upstream Desktop marker. */
 
-import { contextBridge, ipcRenderer, webUtils } from 'electron'
+import * as electron from 'electron'
 import { SETUP_ONBOARDING_CHANNEL } from './setup-onboarding-bridge.ts'
 import { DESKTOP_HOST_PATHS_BRIDGE } from './file-path-bridge-contract.ts'
 import { DESKTOP_NATIVE_DIRECTORY_PICKER_CHANNEL } from './directory-picker-contract.ts'
@@ -11,12 +11,31 @@ import {
   type DesktopRendererActionsBridge,
 } from './renderer-actions-contract.ts'
 
+const { contextBridge, ipcRenderer } = electron
+
+/**
+ * Resolve the filesystem path of a File across Electron majors.
+ *
+ * Electron 32 replaced `File.path` with `webUtils.getPathForFile`; Electron
+ * 22 only exposes `File.path`, so the Windows 7 build probes both and
+ * answers '' for pasted bytes that never had a path.
+ * @param file - renderer File crossing the context bridge.
+ * @returns Absolute path, or an empty string.
+ */
+function filePathFor(file: File): string {
+  const webUtils = (electron as unknown as {
+    webUtils?: { getPathForFile(file: File): string }
+  }).webUtils
+  if (typeof webUtils?.getPathForFile === 'function') return webUtils.getPathForFile(file)
+  return (file as unknown as { path?: string }).path ?? ''
+}
+
 // The official composer cites dropped, picked, and pasted files and folders that have a
 // real path as `@path` references instead of uploading them, and refuses folders outright
 // when this bridge is absent; a File without a path (pasted bytes) answers '' and uploads.
 contextBridge.exposeInMainWorld(DESKTOP_HOST_PATHS_BRIDGE, {
   pathFor(file: File): string {
-    return webUtils.getPathForFile(file)
+    return filePathFor(file)
   },
 })
 

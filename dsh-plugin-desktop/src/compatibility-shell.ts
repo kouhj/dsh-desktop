@@ -1,8 +1,9 @@
-import { WebContentsView, type BrowserWindow, type WebContents } from 'electron'
+import type { WebContents } from 'electron'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { COMPATIBILITY_CHROME_CHANNEL, COMPATIBILITY_CHROME_STATE, type CompatibilityChromeState } from './compatibility-chrome-contract.ts'
 import type { DesktopRendererActionHandlers } from './renderer-actions-dispatch.ts'
 import type { DesktopLocale, DesktopPlatform, DesktopShellSpec } from './runtime.ts'
+import { createDesktopViewStack, type DesktopChildView, type DesktopViewStack } from './electron-view.ts'
 import { DESKTOP_FRAME_HEIGHT } from './window-chrome.ts'
 import { DESKTOP_RENDERER_SESSION_PARTITION } from './window-options.ts'
 
@@ -13,54 +14,63 @@ export interface CompatibilityShellActions extends DesktopRendererActionHandlers
 }
 
 export class CompatibilityShell {
-  readonly content: WebContentsView
   private readonly documentPath = fileURLToPath(new URL('./native-ui/compatibility-chrome.html', import.meta.url))
   private disposed = false
   private remoteControl: CompatibilityChromeState['remoteControl']
-  readonly chromeView: WebContentsView
-  private expanded = false
-  private readonly chrome: WebContents
   /**
-   * The page, held from construction like `chrome`. Electron clears
-   * `WebContentsView.webContents` to `undefined` once that page is destroyed,
-   * which can happen before dispose() — exhausted renderer recovery shows the
-   * window right after the page went away — while this reference keeps
-   * answering `isDestroyed()`.
+   * The page, held from construction like `chrome`. The native view clears its
+   * `webContents` reference once that page is destroyed, which can happen before
+   * dispose() — exhausted renderer recovery shows the window right after the
+   * page went away — while this reference keeps answering `isDestroyed()`.
    */
   private readonly page: WebContents
+  private readonly chrome: WebContents
+  private readonly stack: DesktopViewStack
   private contentBounds: Electron.Rectangle | undefined
   private chromeBounds: Electron.Rectangle | undefined
+  private expanded = false
+
+  /** Stacked views this shell owns; both Electron 22 and 30+ shapes are supported. */
+  readonly content: DesktopChildView
+  /** The compatibility chrome surface drawn above the page. */
+  readonly chromeView: DesktopChildView
 
   constructor(
-    private readonly window: BrowserWindow,
+    private readonly window: Electron.BrowserWindow,
     private readonly spec: DesktopShellSpec,
     private readonly platform: DesktopPlatform,
     preload: string,
     private readonly actions: CompatibilityShellActions,
   ) {
-    this.chromeView = new WebContentsView({ webPreferences: {
-      preload: fileURLToPath(new URL('./compatibility-preload.cjs', import.meta.url)),
-      partition: 'dsh-desktop-compatibility-chrome',
-      contextIsolation: true, nodeIntegration: false, sandbox: true, webSecurity: true,
-    } })
-    this.chromeView.setBackgroundColor('#00000000')
+    this.stack = createDesktopViewStack(
+      window,
+      {
+        preload,
+        partition: DESKTOP_RENDERER_SESSION_PARTITION,
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: true,
+        webSecurity: true,
+      },
+      {
+        preload: fileURLToPath(new URL('./compatibility-preload.cjs', import.meta.url)),
+        partition: 'dsh-desktop-compatibility-chrome',
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: true,
+        webSecurity: true,
+      },
+    )
+    this.content = this.stack.content
+    this.chromeView = this.stack.chrome
     this.chrome = this.chromeView.webContents
-    this.content = new WebContentsView({ webPreferences: {
-      preload,
-      partition: DESKTOP_RENDERER_SESSION_PARTITION,
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true,
-      webSecurity: true,
-    } })
     this.page = this.content.webContents
+    this.chromeView.setBackgroundColor('#00000000')
     // Let the native window material show through the extended sidebar.
-    // CSS transparency alone cannot cross an opaque WebContentsView surface.
+    // CSS transparency alone cannot cross an opaque native view surface.
     if (spec.mode === 'extended' && spec.material !== 'off') {
       this.content.setBackgroundColor('#00000000')
     }
-    window.contentView.addChildView(this.content)
-    window.contentView.addChildView(this.chromeView)
     window.on('resize', this.resize)
     window.on('restore', this.reveal)
     window.on('show', this.reveal)
@@ -139,18 +149,12 @@ export class CompatibilityShell {
   /**
    * Lay out and repaint the embedded views when the window comes back.
    *
-   * Each WebContentsView owns a compositor separate from the native window, so
-   * Chromium stops drawing them while the window is minimized and the restored
-   * frame can present a stale surface. resize() alone cannot cover that: it
-   * deliberately skips minimized windows and the degenerate client area
-   * Windows reports mid-restore, and its sameBounds guard makes it a no-op
+   * Each native child view owns a compositor separate from the window's own
+   * surface, so Chromium stops drawing them while the window is minimized and
+   * the restored frame can present a stale surface. resize() alone cannot cover
+   * that: it deliberately skips minimized windows and the degenerate client
+   * area Windows reports mid-restore, and its sameBounds guard makes it a no-op
    * whenever the window returns at the size it already had.
-   *
-   * This replaces `backgroundThrottling: false` on the content view. Electron
-   * applies that flag to the whole window, so the entire frame kept drawing
-   * and swapping frames while minimized and the renderer was never
-   * backgrounded, which is also the state Chromium requires before it reclaims
-   * renderer memory.
    */
   private readonly reveal = (): void => {
     if (this.disposed || this.window.isDestroyed() || this.window.isMinimized()) return
@@ -209,10 +213,7 @@ export class CompatibilityShell {
       this.chrome.off('will-redirect', this.preventNavigation)
       this.chrome.off('will-attach-webview', this.preventNavigation)
     }
-    if (!this.window.isDestroyed()) {
-      this.window.contentView.removeChildView(this.content)
-      this.window.contentView.removeChildView(this.chromeView)
-    }
+    this.stack.destroy()
     if (!this.chrome.isDestroyed()) this.chrome.close({ waitForBeforeUnload: false })
     if (!this.page.isDestroyed()) this.page.close({ waitForBeforeUnload: false })
   }

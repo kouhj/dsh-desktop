@@ -11,6 +11,7 @@ import { formatUnexpectedHostExit, startIsolatedDesktopHost } from './host-proce
 import * as desktopOffice from './desktop-office.ts'
 import { desktopPrimaryRuntime, resolveDesktopOfficeConfig } from './desktop-office.ts'
 import { app, crashReporter, safeStorage, session, shell } from 'electron'
+import { safeStorageBackend } from './electron-compat.ts'
 import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -330,7 +331,7 @@ function desktopLanHttpsPrivateKeyProtector(): DesktopLanHttpsPrivateKeyProtecto
     available: () => {
       if (!safeStorage.isEncryptionAvailable()) return false
       if (process.platform !== 'linux') return true
-      const backend = safeStorage.getSelectedStorageBackend()
+      const backend = safeStorageBackend(safeStorage)
       return backend !== 'basic_text' && backend !== 'unknown'
     },
     seal: plaintext => safeStorage.encryptString(Buffer.from(plaintext).toString('utf8')),

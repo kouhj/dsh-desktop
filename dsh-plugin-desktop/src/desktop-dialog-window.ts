@@ -235,7 +235,7 @@ export async function showDesktopMessageBox(
   parent?: BrowserWindow,
 ): Promise<MessageBoxReturnValue> {
   const result = await showDesktopDialog({
-    type: options.type ?? 'none',
+    type: (options.type ?? 'none') as never,
     title: options.title ?? DESKTOP_PRODUCT_NAME,
     message: options.message,
     ...(options.detail === undefined ? {} : { detail: options.detail }),

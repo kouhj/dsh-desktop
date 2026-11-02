@@ -16,6 +16,7 @@ import {
 import { isDesktopSetupWizardSelection } from './setup-wizard-contract.ts'
 import { SETUP_ONBOARDING_CHANNEL } from './setup-onboarding-bridge.ts'
 import { CompatibilityShell, type CompatibilityShellActions } from './compatibility-shell.ts'
+import { frameIsDetached, hasFrameNavigateEvent, sessionFetchCompat } from './electron-compat.ts'
 import { installEditingContextMenu, type EditingContextMenuLabels } from './context-menu.ts'
 import { formatDesktopExitCode } from './desktop-logger.ts'
 import { showDesktopMessageBox } from './desktop-dialog-window.ts'
@@ -78,7 +79,7 @@ async function authenticateRendererSession(
   const headers = {
     [spec.rendererAccessHeader.name]: spec.rendererAccessHeader.value,
   }
-  const authenticated = await traceRendererBootStage('authentication-request', () => session.fetch(spec.authenticationUrl, {
+  const authenticated = await traceRendererBootStage('authentication-request', () => sessionFetchCompat(session, spec.authenticationUrl, {
     method: 'GET',
     credentials: 'include',
     redirect: 'follow',
@@ -127,9 +128,9 @@ function requestComesFromRendererOrigin(
 ): boolean {
   if (details.resourceType === 'mainFrame') return true
   const frame = details.frame
-  if (frame === undefined || frame === null || frame.detached || frame.origin !== origin) return false
+  if (frame === undefined || frame === null || frameIsDetached(frame) || frame.origin !== origin) return false
   const top = frame.top ?? (frame.parent === null ? frame : undefined)
-  return top !== undefined && !top.detached && top.origin === origin
+  return top !== undefined && !frameIsDetached(top) && top.origin === origin
 }
 
 /**
@@ -513,11 +514,21 @@ export class ElectronShellGeneration {
       const step = action === 'in' ? 1 : -1
       renderer.setZoomLevel(clampedZoomLevel(renderer.getZoomLevel() + step))
     }
-    const navigate = (event: Electron.Event<Electron.WebContentsWillFrameNavigateEventParams>): void => {
-      if (!event.isMainFrame) return
+    // Electron 22 has no `will-frame-navigate`; its `will-navigate` event covers
+    // the main frame, which is the only frame this guard has to police.
+    const frameNavigateEvent = hasFrameNavigateEvent() ? 'will-frame-navigate' : 'will-navigate'
+    const rendererEvents = renderer as unknown as {
+      on(event: string, listener: (...args: never[]) => void): void
+      off(event: string, listener: (...args: never[]) => void): void
+    }
+    const navigate = (event: Electron.Event, url?: string): void => {
+      const isMainFrame = (event as { isMainFrame?: boolean }).isMainFrame ?? true
+      if (!isMainFrame) return
+      const requestUrl = url ?? (event as { url?: string }).url
+      if (requestUrl === undefined) return
       let targetOrigin: string | undefined
       try {
-        targetOrigin = new URL(event.url).origin
+        targetOrigin = new URL(requestUrl).origin
       } catch {
         targetOrigin = undefined
       }
@@ -595,7 +606,7 @@ export class ElectronShellGeneration {
     window.on('resize', scheduleWindowStateWrite)
     window.on('page-title-updated', preserveBlankTitle)
     renderer.on('before-input-event', handleZoomShortcut)
-    renderer.on('will-frame-navigate', navigate)
+    rendererEvents.on(frameNavigateEvent, navigate as never)
     renderer.on('will-redirect', redirect)
     renderer.on('render-process-gone', rendererGone)
     renderer.on('did-fail-load', loadFailed)
@@ -643,7 +654,7 @@ export class ElectronShellGeneration {
       window.off('ready-to-show', revealStartupSurface)
       cleanupFullscreenTransition()
       renderer.off('before-input-event', handleZoomShortcut)
-      renderer.off('will-frame-navigate', navigate)
+      rendererEvents.off(frameNavigateEvent, navigate as never)
       renderer.off('will-redirect', redirect)
       renderer.off('render-process-gone', rendererGone)
       renderer.off('did-fail-load', loadFailed)

@@ -3,10 +3,38 @@
 import Module, {
   createRequire,
   isBuiltin,
-  registerHooks,
-  type ModuleHooks,
-  type ResolveHookSync,
 } from 'node:module'
+
+/** Node 22.15+ synchronous module hook registration surface. */
+interface ModuleHooks {
+  deregister(): void
+}
+
+interface ResolveHookContext {
+  readonly parentURL?: string
+  readonly conditions?: readonly string[]
+  [key: string]: unknown
+}
+
+interface ResolveHookResult {
+  readonly url: string
+  [key: string]: unknown
+}
+
+type ResolveHookSync = (
+  specifier: string,
+  context: ResolveHookContext,
+  nextResolve: (specifier: string, context: ResolveHookContext) => ResolveHookResult,
+) => ResolveHookResult
+
+type RegisterHooks = (hooks: { resolve: ResolveHookSync }) => ModuleHooks
+
+/**
+ * Electron 22 runs Node 16.17, which has no `module.registerHooks`. The CJS
+ * `_resolveFilename` overlay below still installs there; only ESM import
+ * resolution falls back to Node's default resolver on that engine.
+ */
+const registerHooks = (Module as unknown as { registerHooks?: RegisterHooks }).registerHooks
 import { realpathSync } from 'node:fs'
 import { basename, dirname, isAbsolute, join, relative, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -667,9 +695,11 @@ function ensureResolverState(): ProcessResolverState {
     resolve: ((specifier, context, nextResolve) => nextResolve(specifier, context)) as ResolveHookSync,
     resolveFilename: previousResolveFilename,
   } as ProcessResolverState
-  const hooks = registerHooks({
-    resolve: (specifier, context, nextResolve) => state.resolve(specifier, context, nextResolve),
-  })
+  const hooks: ModuleHooks = registerHooks === undefined
+    ? { deregister: () => {} }
+    : registerHooks({
+      resolve: (specifier, context, nextResolve) => state.resolve(specifier, context, nextResolve),
+    })
   Object.defineProperty(state, 'hooks', { value: hooks, enumerable: true })
   const overlayResolveFilename: CommonJsModuleResolver['_resolveFilename'] = function (
     this: CommonJsModuleResolver,

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, type Plugin } from 'vite'
+import { downlevelCssForChromium108, win7CssDownlevelPlugin } from './scripts/win7/css-compat.mjs'
 
 const { name } = JSON.parse(readFileSync('package.json', 'utf8'))
 
@@ -16,9 +17,13 @@ function onboardingStyles(): Plugin {
       if (client?.type !== 'chunk') throw new Error('Missing Desktop client entry')
       for (const [file, asset] of Object.entries(bundle)) {
         if (asset.type !== 'asset' || !file.endsWith('.css')) continue
-        // Within @scope, Tailwind's root theme must target the scope itself.
-        const source = String(asset.source).replace(/:root,\s*:host\s*\{/gu, ':scope {')
-        const css = `@scope (:root:has(.dshDesktopOnboardingContent)) { ${source} }`
+        // Chromium 108 (the Windows 7 build) has no @scope: flatten the sheet
+        // into prefixed selectors and downlevel its colours before injecting.
+        const source = String(asset.source).replace(
+          /:root,\s*:host\s*\{/gu,
+          ':root:has(.dshDesktopOnboardingContent) {',
+        )
+        const css = downlevelCssForChromium108(source)
         const install = `const style = document.createElement('style'); style.textContent = ${JSON.stringify(css)}; document.head.appendChild(style);`
         const anchor = 'var exports = module.exports;'
         if (!client.code.includes(anchor)) throw new Error('Missing Desktop client factory')
@@ -30,10 +35,10 @@ function onboardingStyles(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), onboardingStyles()],
+  plugins: [react(), tailwindcss(), onboardingStyles(), win7CssDownlevelPlugin()],
   define: { 'process.env.NODE_ENV': JSON.stringify('production') },
   build: {
-    outDir: 'lib', emptyOutDir: false, target: 'es2022', minify: false,
+    outDir: 'lib', emptyOutDir: false, target: 'chrome108', minify: false,
     lib: { entry: 'src/client/index.ts', formats: ['cjs'], fileName: () => 'client.js' },
     rollupOptions: {
       external: id => /^(react(?:-dom)?(?:\/|$)|@deepseek-ai\/)/u.test(id),

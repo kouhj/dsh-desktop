@@ -351,7 +351,7 @@
     "yaml": "^2.9.0"
   },
   "peerDependencies": {
-    "electron": "44.7.0"
+    "electron": "22.3.27"
   },
   "devDependencies": {
     "@base-ui/react": "^1.7.0",
@@ -370,7 +370,7 @@
     "builder-util": "26.15.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "electron": "44.7.0",
+    "electron": "22.3.27",
     "electron-builder": "26.15.7",
     "extract-zip": "2.0.1",
     "fflate": "0.8.2",
@@ -400,7 +400,6 @@
     "electronFuses": {
       "enableEmbeddedAsarIntegrityValidation": false,
       "onlyLoadAppFromAsar": false,
-      "resetAdHocDarwinSignature": true,
       "runAsNode": true
     },
     "directories": {

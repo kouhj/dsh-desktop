@@ -49,6 +49,7 @@ import {
 import type {} from './desktop-settings-controller.ts'
 import { DESKTOP_LAN_HTTPS_CA_PATH } from './lan-https-runtime.ts'
 import { desktopBootRecoveryInjections } from './desktop-boot-recovery.ts'
+import { win7BootPolyfillInjections } from './win7-boot-polyfills.ts'
 import type { DesktopLocale, DesktopShellMode } from './runtime.ts'
 import type {} from './runtime.ts'
 import {
@@ -223,6 +224,7 @@ export function apply(ctx: Context, config: DesktopShellConfig): void {
   )
   ctx.on('webserver/index-inject', table => {
     table.push(...desktopBootRecoveryInjections())
+    table.push(...win7BootPolyfillInjections())
   })
   const desktopSettings = ctx.get('desktopSettingsController')
   if (desktopSettings !== undefined) {

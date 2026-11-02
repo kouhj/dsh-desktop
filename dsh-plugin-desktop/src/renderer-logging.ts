@@ -11,7 +11,8 @@ export function observeDesktopRenderer(contents: WebContents, scope: string): vo
   contents.on('preload-error', (_event, _path, error) => {
     diagnosticLog({ source: 'renderer.boot', event: 'preload.failed', level: 'error', error, fields: { scope, webContentsId: contents.id } })
   })
-  contents.on('console-message', (event, legacyLevel, legacyMessage) => {
+  type ConsoleMessageEvent = Electron.Event & { message?: string; level?: string }
+  contents.on('console-message', ((event: ConsoleMessageEvent, legacyLevel?: unknown, legacyMessage?: unknown) => {
     const message = typeof legacyMessage === 'string' ? legacyMessage : event?.message
     if (typeof message !== 'string') return
     const level = typeof event?.level === 'string' ? event.level : legacyLevel
@@ -25,7 +26,7 @@ export function observeDesktopRenderer(contents: WebContents, scope: string): vo
     }
     diagnosticLog({ source: 'renderer', event: 'console', level: failure ? 'error' : level === 'warning' || level === 2 ? 'warn' : level === 'debug' || level === 0 ? 'debug' : 'info',
       message: message.slice(0, 8192), developer: !failure, fields: { scope, webContentsId: contents.id } })
-  })
+  }) as never)
 }
 
 /** Keep startup milestones even before the page can enable developer logging. */

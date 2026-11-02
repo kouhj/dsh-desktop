@@ -17812,6 +17812,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@electron/get@npm:^2.0.0":
+  version: 2.0.3
+  resolution: "@electron/get@npm:2.0.3"
+  dependencies:
+    debug: "npm:^4.1.1"
+    env-paths: "npm:^2.2.0"
+    fs-extra: "npm:^8.1.0"
+    global-agent: "npm:^3.0.0"
+    got: "npm:^11.8.5"
+    progress: "npm:^2.0.3"
+    semver: "npm:^6.2.0"
+    sumchecker: "npm:^3.0.1"
+  dependenciesMeta:
+    global-agent:
+      optional: true
+  checksum: 10c0/148957d531bac50c29541515f2483c3e5c9c6ba9f0269a5d536540d2b8d849188a89588f18901f3a84c2b4fd376d1e0c5ea2159eb2d17bda68558f57df19015e
+  languageName: node
+  linkType: hard
+
 "@electron/get@npm:^3.0.0":
   version: 3.1.0
   resolution: "@electron/get@npm:3.1.0"
@@ -19903,6 +19922,13 @@ __metadata:
   dependencies:
     undici-types: "npm:~8.3.0"
   checksum: 10c0/f8566d88162241eb55a46f7e4ea097188eab0aaafefea7a58e63adab8c4144eb98c08b7911452c846104c339a0f82282f5e1ed4b26b578d60709614fe2843f4d
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^16.11.26":
+  version: 16.18.126
+  resolution: "@types/node@npm:16.18.126"
+  checksum: 10c0/5c137eb141d33de32b16ff26047ff6d449432b58d0d25f7cced2040c97727d81fe1099a7581eb336d14a6840f5b09e363bdd43d7a6995e8e81eb47aa51e413fc
   languageName: node
   linkType: hard
 
@@ -22771,7 +22797,7 @@ __metadata:
     clsx: "npm:^2.1.1"
     dsh-community-market: "npm:0.1.0-dev.0"
     dshmarket: "npm:1.71.1"
-    electron: "npm:44.7.0"
+    electron: "npm:22.3.27"
     electron-builder: "npm:26.15.7"
     extract-zip: "npm:2.0.1"
     fflate: "npm:0.8.2"
@@ -22801,7 +22827,7 @@ __metadata:
     vitest: "npm:4.1.8"
     yaml: "npm:^2.9.0"
   peerDependencies:
-    electron: 44.7.0
+    electron: 22.3.27
   bin:
     dsh-desktop: lib/bin.js
     dsh-plugin-desktop: lib/bin.js
@@ -22947,6 +22973,19 @@ __metadata:
   version: 1.5.411
   resolution: "electron-to-chromium@npm:1.5.411"
   checksum: 10c0/3106a5ccfc036d125a096ab86e314c6fee4af60ef931f19d94304b4a859ffc1036709ffee923823aa35bff4c1e37694e9f6afa9e54ea7da54feb00f8ff8d69e7
+  languageName: node
+  linkType: hard
+
+"electron@npm:22.3.27":
+  version: 22.3.27
+  resolution: "electron@npm:22.3.27"
+  dependencies:
+    "@electron/get": "npm:^2.0.0"
+    "@types/node": "npm:^16.11.26"
+    extract-zip: "npm:^2.0.1"
+  bin:
+    electron: cli.js
+  checksum: 10c0/4ec1bbdc04686a2c778151ecc989cbe19f26d776c3ac7efc1aebb08c91cc2a4d32ed80f8d1cdea3e9acf22bdbd62ea473dc685201212328491cad6147b7aa3d3
   languageName: node
   linkType: hard
 
@@ -23303,7 +23342,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"extract-zip@npm:2.0.1":
+"extract-zip@npm:2.0.1, extract-zip@npm:^2.0.1":
   version: 2.0.1
   resolution: "extract-zip@npm:2.0.1"
   dependencies:

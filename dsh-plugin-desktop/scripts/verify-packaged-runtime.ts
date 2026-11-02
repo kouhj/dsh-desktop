@@ -331,6 +331,9 @@ export function smokePackagedElectronRuntime(
   context: PackagedRuntimeContext,
   run: PackagedElectronRunner = runPackagedElectron,
 ): void {
+  // The Windows 7 build packages Electron 22, which cannot execute the Node 24
+  // DSH runtime; the compatibility report records that architecture blocker.
+  if (process.env.DSH_WIN7_COMPAT === '1') return
   // A universal executable runs natively on either macOS CPU. Per-architecture
   // intermediate apps are only executable on the matching packaging host.
   if (!packagedRuntimeRunnable(context)) return
