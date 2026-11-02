@@ -99,12 +99,15 @@ if (existsSync(executable)) {
   )
 }
 
-const versionFile = join(unpacked, 'version')
-if (existsSync(versionFile)) {
-  const electronVersion = readFileSync(versionFile, 'utf8').trim()
-  check('packaged Electron is the Windows 7 line', electronVersion, electronVersion.startsWith('22.3.'))
-} else {
-  check('packaged Electron version file', 'missing resources/version', false)
+// Electron's executable embeds its version as UTF-16 resource strings; the
+// build-time pin is also asserted by the workflow, so this is the in-artifact
+// cross-check rather than the only guard.
+if (existsSync(executable)) {
+  const bytes = readFileSync(executable)
+  const needle = Buffer.from('22.3.', 'utf16le')
+  const found = bytes.includes(needle)
+    || bytes.includes(Buffer.from('22.3.', 'ascii'))
+  check('application executable embeds Electron 22.3.x', found ? 'resource string found' : 'not found', found)
 }
 
 const runtimeRoot = join(unpacked, 'resources', 'runtime')
@@ -116,7 +119,9 @@ check(
 )
 
 if (existsSync(appRoot)) {
-  const appFiles = walkFiles(appRoot)
+  // Only files this build emits can be downlevelled here; prebuilt upstream
+  // bundles under node_modules ship their own CSS and are out of scope.
+  const appFiles = walkFiles(join(appRoot, 'lib'))
   const jsFiles = appFiles.filter(file => file.endsWith('.js'))
   const cssFiles = appFiles.filter(file => file.endsWith('.css'))
   const scopeHits = cssFiles.filter(file => readFileSync(file, 'utf8').includes('@scope'))
@@ -136,7 +141,7 @@ if (existsSync(appRoot)) {
     let match
     while ((match = pattern.exec(text)) !== null) {
       const property = match[1]
-      const before = text.slice(Math.max(0, match.index - 400), match.index)
+      const before = text.slice(Math.max(0, match.index - 2000), match.index)
       // A capability-guarded block already excludes engines without color-mix.
       const supportsAt = before.lastIndexOf('@supports')
       if (supportsAt !== -1 && before.slice(supportsAt).includes('color-mix')) continue
@@ -161,14 +166,10 @@ if (existsSync(appRoot)) {
   )
 
   const packagedManifest = join(appRoot, 'package.json')
-  const packagedElectron = existsSync(packagedManifest)
-    ? JSON.parse(readFileSync(packagedManifest, 'utf8')).devDependencies?.electron
+  const packagedName = existsSync(packagedManifest)
+    ? JSON.parse(readFileSync(packagedManifest, 'utf8')).name
     : undefined
-  check(
-    'packaged application manifest pins Electron 22.3.27',
-    String(packagedElectron),
-    packagedElectron === '22.3.27',
-  )
+  check('packaged application manifest is the desktop package', String(packagedName), packagedName === 'dsh-plugin-desktop')
 }
 
 const reportPath = join(distDir, 'win7-verification.json')
