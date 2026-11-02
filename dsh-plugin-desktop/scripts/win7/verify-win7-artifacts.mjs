@@ -15,7 +15,9 @@
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
-const desktopRoot = resolve(import.meta.dirname, '..', '..')
+const desktopRoot = process.env.DSH_WIN7_DESKTOP_ROOT === undefined
+  ? resolve(import.meta.dirname, '..', '..')
+  : resolve(process.env.DSH_WIN7_DESKTOP_ROOT)
 const distDir = join(desktopRoot, 'dist')
 const manifest = JSON.parse(readFileSync(join(desktopRoot, 'package.json'), 'utf8'))
 const results = []
@@ -123,7 +125,9 @@ if (existsSync(appRoot)) {
   check('no oklch() in emitted CSS (Chromium 111+)', `${oklchHits.length} file(s)`, oklchHits.length === 0)
 
   // Every emitted declaration that uses color-mix() must carry a static
-  // fallback for the same property, because Chromium 108 drops the mix.
+  // fallback for the same property, because Chromium 108 drops the mix. The
+  // exception is a declaration inside `@supports (color: color-mix(...))`: the
+  // browser evaluates the capability query first and skips the whole block.
   const colorMixFiles = [...cssFiles, ...jsFiles].filter(file => readFileSync(file, 'utf8').includes('color-mix('))
   const withoutFallback = []
   for (const file of colorMixFiles) {
@@ -133,6 +137,9 @@ if (existsSync(appRoot)) {
     while ((match = pattern.exec(text)) !== null) {
       const property = match[1]
       const before = text.slice(Math.max(0, match.index - 400), match.index)
+      // A capability-guarded block already excludes engines without color-mix.
+      const supportsAt = before.lastIndexOf('@supports')
+      if (supportsAt !== -1 && before.slice(supportsAt).includes('color-mix')) continue
       const fallbackPattern = new RegExp(`(?:^|[;{}\\s])${property}\\s*:\\s*(?!color-mix\\()[^;{}]+[;}]`, 'u')
       if (!fallbackPattern.test(before)) {
         withoutFallback.push(`${relative(appRoot, file)}:${property}`)

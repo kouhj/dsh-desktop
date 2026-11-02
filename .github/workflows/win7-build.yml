@@ -53,6 +53,7 @@ jobs:
         run: echo "dir=$(yarn config get cacheFolder)" >> $env:GITHUB_OUTPUT
 
       - name: Restore the Yarn cache
+        id: yarn-cache
         uses: actions/cache@v4
         with:
           path: ${{ steps.yarn-cache-dir.outputs.dir }}
@@ -64,6 +65,7 @@ jobs:
       # caches below cover Electron 22's dist zip, electron-builder's NSIS and
       # winCodeSign toolsets, and the bundled primary runtime (Node + Python).
       - name: Restore packaging downloads
+        id: packaging-cache
         uses: actions/cache@v4
         with:
           path: |
@@ -77,6 +79,13 @@ jobs:
 
       - name: Install workspace dependencies
         run: yarn install --immutable
+
+      - name: Save the Yarn cache
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.yarn-cache-dir.outputs.dir }}
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Assert the Windows 7 Electron pin
         shell: pwsh
@@ -115,6 +124,17 @@ jobs:
 
       - name: Verify the Windows 7 artifact shape
         run: node dsh-plugin-desktop/scripts/win7/verify-win7-artifacts.mjs
+
+      - name: Save packaging downloads
+        if: steps.packaging-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/AppData/Local/electron/Cache
+            ~/AppData/Local/electron-builder/Cache
+            dsh-plugin-desktop/.desktop-build/downloads
+            dsh-plugin-desktop/.desktop-build/runtime
+          key: ${{ steps.packaging-cache.outputs.cache-primary-key }}
 
       # The packaged runtime smoke inside the packaging hooks is skipped for this
       # channel (DSH_WIN7_COMPAT=1) because it executes the Node 24 DSH runtime,
