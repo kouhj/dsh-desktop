@@ -77,8 +77,6 @@ jobs:
           path: |
             ~/AppData/Local/electron/Cache
             ~/AppData/Local/electron-builder/Cache
-            dsh-plugin-desktop/.desktop-build/downloads
-            dsh-plugin-desktop/.desktop-build/runtime
           key: win7-packaging-${{ runner.os }}-${{ hashFiles('dsh-plugin-desktop/package.json', 'deepseek-harness/scripts/primary-runtime/lock.json') }}
           restore-keys: |
             win7-packaging-${{ runner.os }}-
@@ -138,8 +136,6 @@ jobs:
           path: |
             ~/AppData/Local/electron/Cache
             ~/AppData/Local/electron-builder/Cache
-            dsh-plugin-desktop/.desktop-build/downloads
-            dsh-plugin-desktop/.desktop-build/runtime
           key: ${{ steps.packaging-cache.outputs.cache-primary-key }}
 
       # The packaged runtime smoke inside the packaging hooks is skipped for this

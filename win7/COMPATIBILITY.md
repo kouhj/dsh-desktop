@@ -32,6 +32,7 @@
 | Chromium 108 CSS 降级 | `scripts/win7/css-compat.mjs`、`vite.client.config.ts`、`vite.native-ui.config.ts` | 展开 `@scope`（Chrome 118+）、`oklch()`（111+）转 sRGB、`color-mix()`（111+）插入静态回退声明 |
 | Chromium 108 启动 polyfill | `src/win7-boot-polyfills.ts`、`src/index.ts` | `Promise.withResolvers`(119)、`AbortSignal.any`(116)/`timeout`、`toSorted/toReversed/toSpliced/with`(110)、`Object/Map.groupBy`(117)、`Array.fromAsync`(121)、`Set` 方法(122)、`String.isWellFormed`(111) 以内联 head script 在应用模块之前注入 |
 | 打包期 runtime smoke 跳过开关 | `scripts/verify-packaged-runtime.ts`、`.github/workflows/win7-build.yml` | `DSH_WIN7_COMPAT=1` 时跳过的只是“在 Electron 22 内执行 Node 24 runtime”的 smoke，结构校验仍执行 |
+| **Win7 包 x64-only 裁剪** | `dsh-plugin-desktop/package.json` `build.files` | 排除 `*-win32-arm64*`/`*-win32-ia32*`/`*-darwin-*`/`*-linux-*` 可选原生包（x64 Electron 22 无法加载其它 ABI/CPU 模块），安装包再瘦身约数百 MB |
 | **Win10-only primary runtime 移出 Win7 包** | `scripts/prepare-runtime.ts`、`package-win.ts`、`package-win-portable.ts`、`verify-packaged-runtime.ts` | `DSH_WIN7_SHELL_ONLY=1` 时只写 `WIN7-SHELL-ONLY.txt` 标记，不下载/打包 Node 24 + Python 3.12；`afterPack` 跳过该 payload 校验，产物闸门改为断言其**不存在** |
 | Win7 产物静态闸门 | `scripts/win7/verify-win7-artifacts.mjs` | PE 子系统 ≤6.1、Electron 22.3.27、离线 runtime 在包内、无 `@scope`/`oklch()`、每个 `color-mix()` 有静态回退 |
 
@@ -40,7 +41,7 @@
 - CI：`.github/workflows/win7-build.yml`，`windows-2022`（固定，不用 `windows-latest`，后者已是 Server 2025），Node 22.23.2 仅作构建宿主。
 - 产物：`DSH-Desktop-<version>-x64-Setup.exe`（NSIS）、`DSH-Desktop-<version>-x64-Portable.zip`、`win7-verification.json`。
 - 离线自包含：Win7 渠道**不再携带** Node 24 / Python 3.12 primary runtime（那些二进制无法在 Win7 运行，属 Win10-only 依赖），安装包只含应用本体与壳资源，体积由约 1.3GB 降到数百 MB 量级；主进程的更新检查在离线时静默失败。
-- 构建期网络：Electron 22 zip、electron-builder 的 NSIS/winCodeSign、primary runtime 下载都走 `actions/cache` 预热（见 workflow 的 `Restore packaging downloads`）；离线 runner 复跑需要预先填充这些缓存目录。
+- 构建期网络：Electron 22 zip、electron-builder 的 NSIS/winCodeSign 下载走 `actions/cache` 预热（见 workflow 的 `Restore packaging downloads`）；Win7 渠道不下载 primary runtime，离线 runner 复跑只需预置这两个缓存目录。
 - 本地构建离线化：把上述缓存目录拷贝到对应位置后，`yarn install --immutable` + `yarn workspace dsh-plugin-desktop dist:win` 可在无外网环境完成（Yarn 4 需 `YARN_ENABLE_NETWORK=0` 且本地缓存完整）。
 
 ## 4. 架构级阻断（无法在 Win7 上运行完整功能的原因）

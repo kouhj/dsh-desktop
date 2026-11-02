@@ -419,7 +419,19 @@
       "lib/**",
       "package.json",
       "!node_modules/node-pty/build/**",
-      "!node_modules/fs-ext/build/**"
+      "!node_modules/fs-ext/build/**",
+      "node_modules/**/*-win32-arm64*/**",
+      "node_modules/**/*-win32-ia32*/**",
+      "node_modules/**/*-darwin-arm64*/**",
+      "node_modules/**/*-darwin-x64*/**",
+      "node_modules/**/*-linux-arm64*/**",
+      "node_modules/**/*-linux-x64*/**",
+      "!node_modules/**/*-win32-arm64*/**",
+      "!node_modules/**/*-win32-ia32*/**",
+      "!node_modules/**/*-darwin-arm64*/**",
+      "!node_modules/**/*-darwin-x64*/**",
+      "!node_modules/**/*-linux-arm64*/**",
+      "!node_modules/**/*-linux-x64*/**"
     ],
     "mac": {
       "target": [
