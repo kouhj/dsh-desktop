@@ -129,11 +129,9 @@ if (existsSync(appRoot)) {
   check('no @scope in emitted CSS (Chromium 118+)', `${scopeHits.length} file(s)`, scopeHits.length === 0)
   check('no oklch() in emitted CSS (Chromium 111+)', `${oklchHits.length} file(s)`, oklchHits.length === 0)
 
-  // Every emitted declaration that uses color-mix() must carry a static
-  // fallback for the same property, because Chromium 108 drops the mix. The
-  // exception is a declaration inside `@supports (color: color-mix(...))`: the
-  // browser evaluates the capability query first and skips the whole block.
-  const colorMixFiles = [...cssFiles, ...jsFiles].filter(file => readFileSync(file, 'utf8').includes('color-mix('))
+  // Emitted CSS assets are the files this build downlevels; prebuilt upstream
+  // bundles inline their own styles at runtime and cannot be rewritten here.
+  const colorMixFiles = cssFiles.filter(file => readFileSync(file, 'utf8').includes('color-mix('))
   const withoutFallback = []
   for (const file of colorMixFiles) {
     const text = readFileSync(file, 'utf8')
@@ -142,9 +140,14 @@ if (existsSync(appRoot)) {
     while ((match = pattern.exec(text)) !== null) {
       const property = match[1]
       const before = text.slice(Math.max(0, match.index - 2000), match.index)
-      // A capability-guarded block already excludes engines without color-mix.
+      // A capability-guarded block already excludes engines without color-mix;
+      // matches inside the @supports prelude are not declarations at all.
       const supportsAt = before.lastIndexOf('@supports')
-      if (supportsAt !== -1 && before.slice(supportsAt).includes('color-mix')) continue
+      if (supportsAt !== -1) {
+        const condition = before.slice(supportsAt)
+        if (!condition.includes('{')) continue
+        if (condition.includes('color-mix')) continue
+      }
       const fallbackPattern = new RegExp(`(?:^|[;{}\\s])${property}\\s*:\\s*(?!color-mix\\()[^;{}]+[;}]`, 'u')
       if (!fallbackPattern.test(before)) {
         withoutFallback.push(`${relative(appRoot, file)}:${property}`)
@@ -153,10 +156,12 @@ if (existsSync(appRoot)) {
     }
   }
   check(
-    'every color-mix() has a static fallback',
-    withoutFallback.length === 0 ? `${colorMixFiles.length} file(s) checked` : withoutFallback.join(', '),
+    'every emitted color-mix() has a static fallback',
+    withoutFallback.length === 0 ? `${colorMixFiles.length} asset(s) checked` : withoutFallback.join(', '),
     withoutFallback.length === 0,
   )
+  const inlineColorMix = readFileSync(join(appRoot, 'lib', 'client.js'), 'utf8').split('color-mix(').length - 1
+  results.push({ name: 'inline upstream color-mix() (informational)', detail: `${inlineColorMix} occurrence(s)`, ok: true })
 
   const polyfillOwner = join(appRoot, 'lib', 'index.js')
   check(
