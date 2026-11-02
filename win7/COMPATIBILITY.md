@@ -12,7 +12,7 @@
 | Renderer 构建目标 | `es2022` / Vite 默认 | `chrome108` + `esbuild` 目标同步 | `dsh-plugin-desktop/vite.client.config.ts`、`vite.native-ui.config.ts` |
 | 主进程产物 | ESM | **仍为 ESM**（未改，见 §4 阻断 1） | `tsdown.config.ts: format 'esm'` |
 | 内置 pnpm | 11.28.5（要求 Node ≥22.13） | 未替换（见 §4 阻断 2） | pnpm 11 engines |
-| 随包 runtime | Node 24.21.0 + Python 3.12 | 未替换（Win7 无法运行 Node 18+ 官方二进制） | `deepseek-harness/scripts/primary-runtime/lock.json` |
+| 随包 runtime | Node 24.21.0 + Python 3.12 | **Win7 包不分发**（写入 `WIN7-SHELL-ONLY.txt` 标记；Node ≥18 官方要求 Win8.1/10+，DSH Host 还需 Node ≥24.9） | Node BUILDING.md、`deepseek-harness/scripts/primary-runtime/lock.json` |
 
 ## 2. 本分支已完成的修复（Electron 44 → 22）
 
@@ -32,20 +32,21 @@
 | Chromium 108 CSS 降级 | `scripts/win7/css-compat.mjs`、`vite.client.config.ts`、`vite.native-ui.config.ts` | 展开 `@scope`（Chrome 118+）、`oklch()`（111+）转 sRGB、`color-mix()`（111+）插入静态回退声明 |
 | Chromium 108 启动 polyfill | `src/win7-boot-polyfills.ts`、`src/index.ts` | `Promise.withResolvers`(119)、`AbortSignal.any`(116)/`timeout`、`toSorted/toReversed/toSpliced/with`(110)、`Object/Map.groupBy`(117)、`Array.fromAsync`(121)、`Set` 方法(122)、`String.isWellFormed`(111) 以内联 head script 在应用模块之前注入 |
 | 打包期 runtime smoke 跳过开关 | `scripts/verify-packaged-runtime.ts`、`.github/workflows/win7-build.yml` | `DSH_WIN7_COMPAT=1` 时跳过的只是“在 Electron 22 内执行 Node 24 runtime”的 smoke，结构校验仍执行 |
+| **Win10-only primary runtime 移出 Win7 包** | `scripts/prepare-runtime.ts`、`package-win.ts`、`package-win-portable.ts`、`verify-packaged-runtime.ts` | `DSH_WIN7_SHELL_ONLY=1` 时只写 `WIN7-SHELL-ONLY.txt` 标记，不下载/打包 Node 24 + Python 3.12；`afterPack` 跳过该 payload 校验，产物闸门改为断言其**不存在** |
 | Win7 产物静态闸门 | `scripts/win7/verify-win7-artifacts.mjs` | PE 子系统 ≤6.1、Electron 22.3.27、离线 runtime 在包内、无 `@scope`/`oklch()`、每个 `color-mix()` 有静态回退 |
 
 ## 3. 构建与离线说明
 
 - CI：`.github/workflows/win7-build.yml`，`windows-2022`（固定，不用 `windows-latest`，后者已是 Server 2025），Node 22.23.2 仅作构建宿主。
 - 产物：`DSH-Desktop-<version>-x64-Setup.exe`（NSIS）、`DSH-Desktop-<version>-x64-Portable.zip`、`win7-verification.json`。
-- 离线自包含：安装包内包含 `resources/runtime/x64/primary-runtime`（Node + Python + office 库），安装后无需联网下载；但主进程仍会在启动时做更新检查（静默失败）。
+- 离线自包含：Win7 渠道**不再携带** Node 24 / Python 3.12 primary runtime（那些二进制无法在 Win7 运行，属 Win10-only 依赖），安装包只含应用本体与壳资源，体积由约 1.3GB 降到数百 MB 量级；主进程的更新检查在离线时静默失败。
 - 构建期网络：Electron 22 zip、electron-builder 的 NSIS/winCodeSign、primary runtime 下载都走 `actions/cache` 预热（见 workflow 的 `Restore packaging downloads`）；离线 runner 复跑需要预先填充这些缓存目录。
 - 本地构建离线化：把上述缓存目录拷贝到对应位置后，`yarn install --immutable` + `yarn workspace dsh-plugin-desktop dist:win` 可在无外网环境完成（Yarn 4 需 `YARN_ENABLE_NETWORK=0` 且本地缓存完整）。
 
 ## 4. 架构级阻断（无法在 Win7 上运行完整功能的原因）
 
 1. **Electron 22 不支持主进程 ESM。** 桌面主进程产物是 ESM（`"type": "module"`、`"main": "lib/main.js"`、tsdown `format: 'esm'`），Electron 主进程 ESM 支持从 Electron 28 才开始。产物在 Win7 上启动即失败。要解决必须把主进程切到 CJS 并处理所有 ESM-only 依赖与动态 Loader（审计估算 20+ 文件、6–7 人日，且未含渲染/上游）。
-2. **DSH Host 要求 Node ≥ 24.9，而它跑在 Electron 自带的 Node 里。** Host 由 `utilityProcess.fork(host-process-entry.js)` 启动（`src/host-process.ts`），即 Electron 22 的 Node 16.17；haul 代码使用 `node:sqlite`（10 个文件）、`import.meta.dirname`（227 处）、`node:sea`、`import.meta.main`，Node 16 无法加载。把 primary runtime 的 Node 24 换成 Node 16 也救不了：那套 Node 只服务 office skills，不参与 Host/pnpm（`.win7/audit-runtime-offline.md`）。
+2. **DSH Host 要求 Node ≥ 24.9，而它跑在 Electron 自带的 Node 里。** 正因如此，Win7 包刻意不携带 Node 24/Python 3.12 primary runtime（见 §2 最后一行）。 Host 由 `utilityProcess.fork(host-process-entry.js)` 启动（`src/host-process.ts`），即 Electron 22 的 Node 16.17；haul 代码使用 `node:sqlite`（10 个文件）、`import.meta.dirname`（227 处）、`node:sea`、`import.meta.main`，Node 16 无法加载。把 primary runtime 的 Node 24 换成 Node 16 也救不了：那套 Node 只服务 office skills，不参与 Host/pnpm（`.win7/audit-runtime-offline.md`）。
 3. **内置 pnpm 11.28.5 要求 Node ≥22.13**，通过 `ELECTRON_RUN_AS_NODE` 在 Electron 22 的 Node 16 里执行 `pnpm.mjs`，必然失败；降 pnpm 到 8.15.9 也需重打 200+ vendored tarball 与 lockfile，且 Host 本身仍是阻断。
 4. 其他降级项（不致命但影响体验）：node-pty 1.2 在 Windows 仅 ConPTY（Win10 1809+），Win7 内嵌终端不可用；Tailwind 4 基线 Chrome 111，`color-mix()` 只能做静态回退，部分半透明层次会与设计稿有差异；上游预构建 `@deepseek-ai/dsh-web-frontend` 的 CSS/JS 不受本仓库构建控制。
 
@@ -68,4 +69,4 @@
 - 发布 run 与产物（tag `win7-v2.0.18`）：<https://github.com/kouhj/dsh-desktop/releases/tag/win7-v2.0.18>
   - `DSH-Desktop-2.0.18-x64-Setup.exe`（NSIS 安装包，含离线 runtime）
   - `DSH-Desktop-2.0.18-x64-Portable.zip`
-  - `win7-verification.json`（12 项产物闸门全部 PASS：PE 子系统 5.2、Electron 22.3.x 资源串、离线 runtime、CSS 降级、boot polyfill）
+  - `win7-verification.json`（产物闸门全部 PASS：PE 子系统 5.2、Electron 22.3.x 资源串、Win10-only runtime 未打包、CSS 降级、boot polyfill）

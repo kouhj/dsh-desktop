@@ -1,5 +1,5 @@
 /** Prepare, execute and check the bundled interpreter payloads for every CPU one Desktop package carries; ported from upstream Desktop. */
-import { existsSync, readFileSync, rmSync, statSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -34,6 +34,31 @@ export function desktopRuntimeTargets(platform: NodeJS.Platform, env: NodeJS.Pro
   if (platform === 'win32') return [{ target: 'win-x64', arch: 'x64' }]
   if (platform === 'linux') return [{ target: 'linux-x64', arch: 'x64' }]
   return []
+}
+
+/**
+ * Materialize the Windows 7 shell-only runtime marker.
+ *
+ * The Windows 7 channel cannot execute the primary runtime: the bundled Node
+ * 24 / Python 3.12 payload requires Windows 10-class APIs and the DSH Host
+ * itself needs Node >= 24.9 while Electron 22 runs Node 16.17. Shipping that
+ * payload would only install dead binaries, so the Win7 installer omits it and
+ * records the omission next to the extra-resources root.
+ * @param desktopRoot - Desktop package root.
+ */
+export function prepareWin7ShellOnlyRuntime(desktopRoot: string): void {
+  const { runtime } = desktopRuntimeBuildPaths(desktopRoot)
+  rmSync(runtime, { recursive: true, force: true })
+  mkdirSync(runtime, { recursive: true })
+  writeFileSync(join(runtime, 'WIN7-SHELL-ONLY.txt'), [
+    'DSH Desktop Windows 7 SP1 shell-only channel.',
+    '',
+    'The Node 24 / Python 3.12 primary runtime is intentionally not shipped:',
+    'it requires Windows 10-class APIs, and the DSH Host additionally requires',
+    'Node >= 24.9 while Electron 22 embeds Node 16.17.',
+    'See win7/COMPATIBILITY.md for the compatibility matrix and blockers.',
+    '',
+  ].join('\n'), 'utf8')
 }
 
 /**

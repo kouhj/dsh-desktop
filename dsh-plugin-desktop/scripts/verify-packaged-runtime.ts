@@ -916,7 +916,7 @@ export async function afterPack(
 ): Promise<void> {
   const summary = verify(context)
   verifyAa(context)
-  verifyRuntime(context)
+  if (process.env.DSH_WIN7_SHELL_ONLY !== '1') verifyRuntime(context)
   report(summary)
 }
 

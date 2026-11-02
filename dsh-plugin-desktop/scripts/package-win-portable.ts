@@ -6,12 +6,14 @@ import {
   createWindowsPackageOptions,
   packageWindowsArtifact,
 } from './package-win.ts'
-import { prepareDesktopInterpreters } from './prepare-runtime.ts'
+import { prepareDesktopInterpreters, prepareWin7ShellOnlyRuntime } from './prepare-runtime.ts'
 
 const invokedPath = process.argv[1]
 if (invokedPath !== undefined && invokedPath === fileURLToPath(import.meta.url)) {
   try {
-    await prepareDesktopInterpreters({ desktopRoot: resolve(dirname(fileURLToPath(import.meta.url)), '..') })
+    const desktopRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+    if (process.env.DSH_WIN7_SHELL_ONLY === '1') prepareWin7ShellOnlyRuntime(desktopRoot)
+    else await prepareDesktopInterpreters({ desktopRoot })
     packageWindowsArtifact(
       createWindowsPackageOptions('./verify-win-portable.ts'),
       'zip',

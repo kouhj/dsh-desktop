@@ -112,11 +112,26 @@ if (existsSync(executable)) {
 
 const runtimeRoot = join(unpacked, 'resources', 'runtime')
 const runtimeNode = join(runtimeRoot, 'x64', 'primary-runtime', 'dependencies', 'node')
-check(
-  'bundled offline runtime payload',
-  relative(unpacked, runtimeNode),
-  existsSync(runtimeNode),
-)
+if (process.env.DSH_WIN7_SHELL_ONLY === '1') {
+  // The Win7 channel must not ship the Node 24 / Python 3.12 runtime: those
+  // payloads require Windows 10-class APIs and would only be dead weight.
+  check(
+    'Win7 shell-only runtime marker',
+    relative(unpacked, join(runtimeRoot, 'WIN7-SHELL-ONLY.txt')),
+    existsSync(join(runtimeRoot, 'WIN7-SHELL-ONLY.txt')),
+  )
+  check(
+    'Windows 10-only primary runtime excluded',
+    relative(unpacked, runtimeNode),
+    !existsSync(runtimeNode),
+  )
+} else {
+  check(
+    'bundled offline runtime payload',
+    relative(unpacked, runtimeNode),
+    existsSync(runtimeNode),
+  )
+}
 
 if (existsSync(appRoot)) {
   // Only files this build emits can be downlevelled here; prebuilt upstream

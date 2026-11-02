@@ -24,14 +24,18 @@ concurrency:
 
 env:
   DSH_WIN7_COMPAT: '1'
+  # Shell-only runtime channel: the Win7 installer must not ship the Node 24 /
+  # Python 3.12 payload, which requires Windows 10-class APIs.
+  DSH_WIN7_SHELL_ONLY: '1'
   DSH_TELEMETRY_DISABLED: '1'
 
 jobs:
   build:
     name: Build Windows 7 SP1 artifacts
-    # windows-2022 is pinned deliberately: windows-latest is Windows Server 2025
-    # and its image changes away from the Electron 22 toolchain assumptions.
-    runs-on: windows-2022
+    # windows-latest is the requested target image (currently Windows Server
+    # 2025). If a future image drift breaks the Electron 22 toolchain, pin
+    # `windows-2022` here; the packaging steps do not depend on a compiler.
+    runs-on: windows-latest
     timeout-minutes: 150
     permissions:
       contents: write
@@ -110,7 +114,7 @@ jobs:
           if ($oklch) { throw "Chromium 108 build still emits oklch(): $($oklch.Path -join ', ')" }
           Write-Output "Renderer CSS is Chromium 108 compatible"
 
-      - name: Build the Windows installer
+      - name: Build the Windows installer (shell-only runtime)
         env:
           DSH_PACKAGE_CHECK_ALREADY_RAN: '1'
           # CI artifacts are never published; skipping compression saves minutes.
