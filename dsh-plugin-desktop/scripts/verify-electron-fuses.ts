@@ -375,7 +375,9 @@ export function resolveFinalPackagedRuntimeContexts(
 /** The final artifact check: the Electron smoke, then the interpreter payloads code signing must have left as prepared. */
 export function smokeFinalPackagedRuntime(context: PackagedRuntimeContext): void {
   smokePackagedElectronRuntime(context)
-  verifyPackagedPrimaryRuntime(context)
+  // The Windows 7 shell-only channel deliberately omits the Node 24 / Python
+  // 3.12 primary runtime, so its payload manifest must not be required there.
+  if (process.env.DSH_WIN7_SHELL_ONLY !== '1') verifyPackagedPrimaryRuntime(context)
 }
 
 export async function afterAllArtifactBuild(
