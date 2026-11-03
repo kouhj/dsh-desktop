@@ -1,0 +1,157 @@
+### modern JS APIs in desktop packages (file:line)
+dsh-plugin-desktop/src/native-dialog-copy.ts:113:    upToDateMessage: 'You are using the latest version.',
+dsh-plugin-desktop/src/native-dialog-copy.ts:157:      + `Switching leaves the current directory untouched, and ${otherProductName} keeps using it.\n`
+dsh-plugin-desktop/src/runtime.ts:241:  /** Open the isolated native Profile creator, focusing an existing instance. */
+dsh-plugin-desktop/src/desktop-settings-contract.ts:69:  /** Always-available loopback URL using the actual listening port. */
+dsh-plugin-desktop/src/shutdown.ts:16:  /** Schedule a fresh Electron process using the current command line. */
+dsh-desktop-next/src/host/sharp-wasm.ts:20: * conflict sharp's `SharpElectronLinux` warning names. Refusing the native packages makes `sharp` fall
+dsh-plugin-desktop/src/module-resolution.ts:392:    // using it can resurrect a dangling path or a previous app generation.
+dsh-plugin-desktop-beta/src/host/sharp-wasm.ts:20: * conflict sharp's `SharpElectronLinux` warning names. Refusing the native packages makes `sharp` fall
+dsh-plugin-desktop/src/profile.ts:1617:    : { ...loadedProfile.profile, patches: structuredClone([...hooks.profilePatches]) }
+dsh-plugin-desktop/src/profile.ts:1983:      marketSelection: structuredClone(marketSelection),
+dsh-plugin-desktop/src/profile.ts:1989:    patches: structuredClone(patches),
+dsh-plugin-desktop/src/desktop-installer-quit.ts:20: * application launches while preventing an internal command from focusing the
+dsh-plugin-desktop/src/desktop-factory-reset.ts:56:    throw new Error(`${DESKTOP_PACKAGE_NAME}: refusing to reset a filesystem root`)
+dsh-plugin-desktop/src/desktop-factory-reset.ts:65:      throw new Error(`${DESKTOP_PACKAGE_NAME}: refusing to reset a directory that contains protected Desktop or user files`)
+dsh-plugin-desktop/src/profile-context.ts:58:    overlays: structuredClone(prepared.overlays ?? []),
+dsh-plugin-desktop/src/recovery-copy.ts:214:    safeModeActiveBody: 'You are using a temporary environment. Existing Profiles and data are not loaded. Configuration actions here affect only the temporary environment. Restart to leave Safe Mode.',
+dsh-plugin-desktop/src/recovery-copy.ts:222:    safeModeNotificationBody: 'The app is using a temporary environment without loading existing DSH data. The next normal startup restores access to existing data and removes the temporary environment.',
+dsh-plugin-desktop/src/diagnostic-export-worker.ts:91:    throw new Error('dsh-plugin-desktop: refusing linked Host log directory')
+dsh-plugin-desktop/src/diagnostic-export-worker.ts:135:    throw new Error('dsh-plugin-desktop: refusing linked crash dump directory')
+dsh-plugin-desktop/src/diagnostic-export-worker.ts:199:    throw new Error('dsh-plugin-desktop: refusing linked log directory')
+dsh-plugin-desktop/src/diagnostic-export-worker.ts:205:    throw new Error('dsh-plugin-desktop: refusing linked diagnostics directory')
+dsh-plugin-desktop/src/log-files.ts:82:      throw new Error('dsh-plugin-desktop: refusing linked log directory')
+dsh-desktop-next/src/client/plugin-controls.tsx:1:/** Desktop choices on the official Plugins overview, using its manager and existing controls. */
+dsh-plugin-desktop/src/package-overlay.ts:128:/** Find one package root using the Desktop/Profile overlay rule. */
+dsh-plugin-desktop/src/setup-wizard-settings.ts:358:  const output = structuredClone(root)
+dsh-plugin-desktop/src/setup-wizard-settings.ts:508:    const root = structuredClone(loaded.root)
+dsh-plugin-desktop/src/setup-wizard-settings.ts:550:    const root = structuredClone(loaded.root)
+dsh-plugin-desktop/src/setup-wizard-settings.ts:593:    const root = structuredClone(loaded.root)
+dsh-plugin-desktop-beta/src/client/plugin-controls.tsx:1:/** Desktop choices on the official Plugins overview, using its manager and existing controls. */
+dsh-plugin-desktop/src/settings-bridge.ts:99:  mode: z.union(['compatibility', 'extended', 'advanced'] as const).default('compatibility'),
+dsh-plugin-desktop/src/settings-bridge.ts:100:  macosMaterial: z.union(['off', 'transparent'] as const).default(DEFAULT_MACOS_WINDOW_MATERIAL),
+dsh-plugin-desktop/src/settings-bridge.ts:103:  windowsMaterial: z.union(['off', 'acrylic', 'mica'] as const).default(DEFAULT_WINDOWS_WINDOW_MATERIAL),
+dsh-plugin-desktop/src/settings-bridge.ts:104:  linuxMaterial: z.union(['off', 'transparent'] as const).default(DEFAULT_LINUX_WINDOW_MATERIAL),
+dsh-plugin-desktop/src/settings-bridge.ts:107:  networkExposure: z.union(['loopback', 'lan'] as const).default('loopback'),
+dsh-plugin-desktop/src/settings-bridge.ts:108:  logLevel: z.union(['debug', 'info', 'warn', 'error'] as const).default('info'),
+dsh-plugin-desktop/src/settings-bridge.ts:148:  mode: z.union(['compatibility', 'extended', 'advanced'] as const).default('compatibility').volatile(),
+dsh-plugin-desktop/src/settings-bridge.ts:149:  macosMaterial: z.union(['off', 'transparent'] as const).default(DEFAULT_MACOS_WINDOW_MATERIAL).volatile(),
+dsh-plugin-desktop/src/settings-bridge.ts:151:  windowsMaterial: z.union(['off', 'acrylic', 'mica'] as const).default(DEFAULT_WINDOWS_WINDOW_MATERIAL).volatile(),
+dsh-plugin-desktop/src/settings-bridge.ts:152:  linuxMaterial: z.union(['off', 'transparent'] as const).default(DEFAULT_LINUX_WINDOW_MATERIAL).volatile(),
+dsh-plugin-desktop/src/settings-bridge.ts:155:  networkExposure: z.union(['loopback', 'lan'] as const).default('loopback').volatile(),
+dsh-plugin-desktop/src/settings-bridge.ts:156:  logLevel: z.union(['debug', 'info', 'warn', 'error'] as const).default('info').volatile(),
+dsh-plugin-desktop/src/client/extended-shell.ts:15:/** Own the extended root/sidebar surface without reusing enhanced-mode chrome. */
+dsh-plugin-desktop/src/setup-wizard-copy.ts:106:    firstProfileSetup: 'Complete Desktop setup before using this configuration environment (Profile) for the first time.',
+dsh-plugin-desktop/src/setup-wizard-copy.ts:136:    lanBody: 'Other devices on the same local network can connect using the access link. First install and trust the certificate provided by this computer on each device.',
+dsh-plugin-desktop/src/setup-wizard-copy.ts:169:    startUsing: 'Start using DSH Desktop',
+dsh-plugin-desktop/src/electron-runtime.ts:1113:  /** Keep the app menu renderer-free by reusing trusted native tray contributions. */
+dsh-plugin-desktop/src/platform-login-window.ts:53:  // Loopback and plaintext traffic never belongs to the Platform; refusing it keeps the page from probing local services.
+dsh-plugin-desktop/src/platform-login-window.ts:83:    signal: AbortSignal.timeout(CALLBACK_TIMEOUT_MS),
+dsh-plugin-desktop/src/desktop-market.ts:161:/** Read the state using the Electron user-data directory convention. */
+dsh-plugin-desktop/src/desktop-market.ts:212:/** Persist an explicit provider choice using the fixed Electron user-data path. */
+dsh-plugin-desktop/src/profile-materializer.ts:210: * Host or using a shell. Restores use a frozen lockfile; an explicit Profile
+dsh-plugin-desktop/src/profile-manager.ts:160: * Create a safe Web profile using only the shipped template.
+dsh-plugin-desktop/src/profile-manager.ts:329:/** Return whether a profile is eligible for deletion using current selection state. */
+dsh-plugin-desktop/src/client/plugin-controls.tsx:1:/** Desktop choices on the official Plugins overview, using its manager and existing controls. */
+dsh-plugin-desktop/src/client/launch-workspace.ts:25:   * Register one folder, reusing the existing Workspace when the path is known.
+dsh-desktop-next/src/client/index.ts:39:    en: { settings: 'Desktop settings', language: 'en', safeMode: 'Safe mode', safeModeDetail: 'You are using a temporary environment. Exiting Safe Mode and restarting returns to the original Profile and removes the temporary data.', dismiss: 'Dismiss notice', recovery: 'Open recovery assistant' },
+dsh-desktop-next/src/updates.ts:95:      request: this.options.request, signal: AbortSignal.any([signal, AbortSignal.timeout(20_000)]) })
+dsh-desktop-next/src/updates.ts:140:          signal: AbortSignal.any([signal, AbortSignal.timeout(60 * 60_000)]), onProgress: (received, total) => {
+dsh-plugin-desktop-beta/src/client/index.ts:39:    en: { settings: 'Desktop settings', language: 'en', safeMode: 'Safe mode', safeModeDetail: 'You are using a temporary environment. Exiting Safe Mode and restarting returns to the original Profile and removes the temporary data.', dismiss: 'Dismiss notice', recovery: 'Open recovery assistant' },
+dsh-desktop-next/src/private-files.ts:36:  if (info && (!info.isFile() || info.isSymbolicLink())) throw new Error(`Refusing to replace a linked or non-file configuration: ${path}`)
+dsh-plugin-desktop-beta/src/program-directory.ts:79: * @returns the refusing overlap, or undefined when the folder is acceptable.
+dsh-desktop-next/src/web-document.ts:24:export const APP_BOOT_SCRIPT = '<script>globalThis.__DSH_BOOT_READY__ = Promise.withResolvers();'
+dsh-plugin-desktop-beta/src/platform-login-window.ts:46:  // Loopback and plaintext traffic never belongs to the Platform; refusing it keeps the page from probing local services.
+dsh-plugin-desktop-beta/src/platform-login-window.ts:67:    method: 'GET', redirect: 'manual', signal: AbortSignal.timeout(CALLBACK_TIMEOUT),
+dsh-plugin-desktop-beta/src/runtime-tree.ts:294: * Seal a prepared payload using bounded asynchronous readers and unchanged descriptor bytes.
+dsh-desktop-next/src/menu-locale.ts:7:/** Follow the OS preference order, using the same primary-language match as the official frontend. */
+dsh-plugin-desktop-beta/src/updates.ts:95:      request: this.options.request, signal: AbortSignal.any([signal, AbortSignal.timeout(20_000)]) })
+dsh-plugin-desktop-beta/src/updates.ts:140:          signal: AbortSignal.any([signal, AbortSignal.timeout(60 * 60_000)]), onProgress: (received, total) => {
+dsh-plugin-desktop-beta/src/menu-locale.ts:7:/** Follow the OS preference order, using the same primary-language match as the official frontend. */
+dsh-plugin-desktop-beta/src/private-files.ts:36:  if (info && (!info.isFile() || info.isSymbolicLink())) throw new Error(`Refusing to replace a linked or non-file configuration: ${path}`)
+dsh-plugin-desktop-beta/src/web-document.ts:24:export const APP_BOOT_SCRIPT = '<script>globalThis.__DSH_BOOT_READY__ = Promise.withResolvers();'
+dsh-plugin-desktop-beta/src/main.ts:936:    const operation = runner.runPlugin(args, directory, AbortSignal.timeout(120_000))
+dsh-plugin-desktop-beta/src/native-ui/onboarding.tsx:1:/** AA-inspired first-run flow, using the existing Desktop theme and controls. */
+dsh-plugin-desktop-beta/src/native-ui/onboarding.tsx:103:    { value: 'lan', title: t('局域网', 'Local network'), badge: 'Beta', detail: t('同一局域网中的其他设备可通过访问链接连接。请先在访问设备上安装并信任本机提供的证书。', 'Other devices on the same local network can connect using the access link. First install and trust the certificate provided by this computer on each device.') },
+dsh-desktop-next/src/native-ui/main.tsx:90:    safeModeActiveBody: t('当前主窗口使用临时环境。可在恢复助手中检查和修复原 Profile。退出安全模式并重启后，将返回原 Profile，临时数据不会保留。', 'The main window is using a temporary environment. Use the recovery assistant to inspect and repair the original Profile. Exiting Safe Mode and restarting returns to that Profile and removes the temporary data.'),
+dsh-plugin-desktop-beta/src/native-ui/main.tsx:90:    safeModeActiveBody: t('当前主窗口使用临时环境。可在恢复助手中检查和修复原 Profile。退出安全模式并重启后，将返回原 Profile，临时数据不会保留。', 'The main window is using a temporary environment. Use the recovery assistant to inspect and repair the original Profile. Exiting Safe Mode and restarting returns to that Profile and removes the temporary data.'),
+dsh-desktop-next/src/program-directory.ts:79: * @returns the refusing overlap, or undefined when the folder is acceptable.
+dsh-desktop-next/src/platform-login-window.ts:46:  // Loopback and plaintext traffic never belongs to the Platform; refusing it keeps the page from probing local services.
+dsh-desktop-next/src/platform-login-window.ts:67:    method: 'GET', redirect: 'manual', signal: AbortSignal.timeout(CALLBACK_TIMEOUT),
+dsh-desktop-next/src/native-ui/onboarding.tsx:1:/** AA-inspired first-run flow, using the existing Desktop theme and controls. */
+dsh-desktop-next/src/native-ui/onboarding.tsx:103:    { value: 'lan', title: t('局域网', 'Local network'), badge: 'Beta', detail: t('同一局域网中的其他设备可通过访问链接连接。请先在访问设备上安装并信任本机提供的证书。', 'Other devices on the same local network can connect using the access link. First install and trust the certificate provided by this computer on each device.') },
+dsh-desktop-next/src/runtime-tree.ts:294: * Seal a prepared payload using bounded asynchronous readers and unchanged descriptor bytes.
+dsh-desktop-next/src/main.ts:936:    const operation = runner.runPlugin(args, directory, AbortSignal.timeout(120_000))
+
+### web APIs used in renderer (file:line)
+dsh-plugin-desktop/src/client/plugin-controls-styles.ts:57:button.dshNextMarketRemoveBtn { border-color: color-mix(in srgb, var(--dsw-alias-state-error-primary) 35%, transparent); background: color-mix(in srgb, var(--dsw-alias-state-error-primary) 10%, transparent); color: var(--dsw-alias-state-error-primary); }
+dsh-plugin-desktop/src/client/plugin-controls-styles.ts:58:button.dshNextMarketRemoveBtn:hover:not(:disabled) { background: color-mix(in srgb, var(--dsw-alias-state-error-primary) 16%, transparent); }
+dsh-plugin-desktop/src/client/AdvancedFrame.tsx:49:    const observer = new ResizeObserver(() => {
+dsh-plugin-desktop/src/client/desktop-settings-styles.ts:144:  box-shadow: 0 0 0 2px color-mix(in srgb, var(--dsw-alias-brand-primary) 20%, transparent);
+dsh-plugin-desktop/src/client/desktop-settings-styles.ts:181:  box-shadow: 0 12px 32px color-mix(in srgb, #000 28%, transparent);
+dsh-plugin-desktop/src/client/desktop-settings-styles.ts:263:.dshDesktopSettingsError { color: var(--dsw-alias-state-error-primary); background: color-mix(in srgb, var(--dsw-alias-state-error-primary) 10%, transparent); }
+dsh-plugin-desktop/src/client/desktop-settings-styles.ts:264:.dshDesktopSettingsSuccess { color: var(--dsw-alias-state-success-primary); background: color-mix(in srgb, var(--dsw-alias-state-success-primary) 10%, transparent); }
+dsh-plugin-desktop/src/client/desktop-settings-styles.ts:395:  background: color-mix(in srgb, #000 55%, transparent);
+dsh-plugin-desktop/src/client/desktop-settings-styles.ts:404:  box-shadow: 0 24px 64px color-mix(in srgb, #000 38%, transparent);
+dsh-plugin-desktop/src/client/extended-styles.ts:83:  --dsh-desktop-frame-fill: color-mix(in srgb, var(--dsw-alias-bg-base) 54%, transparent);
+dsh-plugin-desktop/src/client/extended-styles.ts:86:  --dsh-desktop-frame-fill: color-mix(in srgb, var(--dsw-alias-bg-base) 18%, transparent);
+dsh-plugin-desktop/src/client/extended-styles.ts:167:  box-shadow: 0 12px 32px color-mix(in srgb, #000 28%, transparent);
+dsh-plugin-desktop/src/client/extended-styles.ts:192:  background: color-mix(in srgb, var(--dsw-alias-bg-base) 48%, transparent);
+dsh-plugin-desktop/src/client/extended-styles.ts:324:  background: color-mix(in srgb, var(--dsw-alias-bg-base) 34%, transparent);
+dsh-plugin-desktop/src/client/extended-styles.ts:353:  box-shadow: 0 12px 32px color-mix(in srgb, #000 28%, transparent);
+dsh-plugin-desktop/src/client/extended-styles.ts:381:  border: 1px solid color-mix(in srgb, var(--dsw-alias-state-error-primary) 40%, transparent);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:27:  --background: oklch(1 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:28:  --foreground: oklch(0.145 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:29:  --card: oklch(1 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:30:  --card-foreground: oklch(0.145 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:31:  --popover: oklch(1 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:32:  --popover-foreground: oklch(0.145 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:33:  --primary: oklch(0.205 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:34:  --primary-foreground: oklch(0.985 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:35:  --secondary: oklch(0.97 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:36:  --secondary-foreground: oklch(0.205 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:37:  --muted: oklch(0.97 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:38:  --muted-foreground: oklch(0.556 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:39:  --destructive: oklch(0.577 0.245 27.325);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:40:  --border: oklch(0.922 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:41:  --input: oklch(0.922 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:42:  --ring: oklch(0.708 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:48:  --background: oklch(0.145 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:49:  --foreground: oklch(0.985 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:50:  --card: oklch(0.205 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:51:  --card-foreground: oklch(0.985 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:52:  --popover: oklch(0.205 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:53:  --popover-foreground: oklch(0.985 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:54:  --primary: oklch(0.922 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:55:  --primary-foreground: oklch(0.205 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:56:  --secondary: oklch(0.269 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:57:  --secondary-foreground: oklch(0.985 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:58:  --muted: oklch(0.269 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:59:  --muted-foreground: oklch(0.708 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:60:  --destructive: oklch(0.704 0.191 22.216);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:61:  --border: oklch(1 0 0 / 10%);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:62:  --input: oklch(1 0 0 / 15%);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:63:  --ring: oklch(0.556 0 0);
+dsh-plugin-desktop/src/native-ui/shared/theme.css:93:  background: color-mix(in oklch, var(--background) 92%, transparent);
+dsh-plugin-desktop/src/native-ui/compatibility-chrome/style.css:27:  --dsh-desktop-frame-fill: color-mix(in srgb, var(--dsw-alias-bg-base) 54%, transparent);
+dsh-plugin-desktop/src/native-ui/compatibility-chrome/style.css:30:  --dsh-desktop-frame-fill: color-mix(in srgb, var(--dsw-alias-bg-base) 18%, transparent);
+dsh-plugin-desktop/src/native-ui/compatibility-chrome/style.css:111:  box-shadow: 0 12px 32px color-mix(in srgb, #000 28%, transparent);
+dsh-plugin-desktop/src/native-ui/compatibility-chrome/style.css:136:  background: color-mix(in srgb, var(--dsw-alias-bg-base) 48%, transparent);
+dsh-plugin-desktop/src/native-ui/compatibility-chrome/style.css:268:  background: color-mix(in srgb, var(--dsw-alias-bg-base) 34%, transparent);
+dsh-plugin-desktop/src/native-ui/compatibility-chrome/style.css:297:  box-shadow: 0 12px 32px color-mix(in srgb, #000 28%, transparent);
+dsh-plugin-desktop/src/native-ui/compatibility-chrome/style.css:325:  border: 1px solid color-mix(in srgb, var(--dsw-alias-state-error-primary) 40%, transparent);
+dsh-plugin-desktop-beta/src/native-ui/theme.css:29:  --dsw-alias-button-primary-hover: color-mix(in srgb, var(--primary) 90%, var(--background));
+dsh-plugin-desktop-beta/src/native-ui/theme.css:38:  --dsw-alias-state-success-primary: oklch(.65 .16 150);
+dsh-plugin-desktop-beta/src/native-ui/onboarding.css:166:.next-onboarding-devices img { grid-row: 1; width: 100%; height: auto; filter: drop-shadow(0 18px 22px color-mix(in srgb, var(--foreground) 8%, transparent)); }
+dsh-plugin-desktop-beta/src/native-ui/onboarding.css:170:.next-onboarding-screen { position: relative; display: flex; flex-direction: column; aspect-ratio: 1.4; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--card); box-shadow: 0 18px 50px color-mix(in srgb, var(--foreground) 5%, transparent); }
+dsh-plugin-desktop-beta/src/client/plugin-controls-styles.ts:76:button.dshNextMarketRemoveBtn { border-color: color-mix(in srgb, var(--dsw-alias-state-error-primary) 35%, transparent); background: color-mix(in srgb, var(--dsw-alias-state-error-primary) 10%, transparent); color: var(--dsw-alias-state-error-primary); }
+dsh-plugin-desktop-beta/src/client/plugin-controls-styles.ts:77:button.dshNextMarketRemoveBtn:hover:not(:disabled) { background: color-mix(in srgb, var(--dsw-alias-state-error-primary) 16%, transparent); }
+dsh-plugin-desktop-beta/src/client/sidebar-footer-styles.ts:301:  const resizeObserver = typeof ResizeObserver !== 'undefined'
+dsh-plugin-desktop-beta/src/client/sidebar-footer-styles.ts:302:    ? new ResizeObserver(entries => {
+dsh-plugin-desktop-beta/src/client/desktop-settings-styles.ts:195:  box-shadow: 0 0 0 2px color-mix(in srgb, var(--dsw-alias-brand-primary) 20%, transparent);
+dsh-plugin-desktop-beta/src/client/desktop-settings-styles.ts:293:  box-shadow: 0 12px 32px color-mix(in srgb, #000 28%, transparent);
+dsh-plugin-desktop-beta/src/client/desktop-settings-styles.ts:386:.dshDesktopSettingsError { color: var(--dsw-alias-state-error-primary); background: color-mix(in srgb, var(--dsw-alias-state-error-primary) 10%, transparent); }
+dsh-plugin-desktop-beta/src/client/desktop-settings-styles.ts:387:.dshDesktopSettingsSuccess { color: var(--dsw-alias-state-success-primary); background: color-mix(in srgb, var(--dsw-alias-state-success-primary) 10%, transparent); }
+dsh-plugin-desktop-beta/src/client/desktop-settings-styles.ts:542:  background: color-mix(in srgb, #000 55%, transparent);
+dsh-plugin-desktop-beta/src/client/desktop-settings-styles.ts:551:  box-shadow: 0 24px 64px color-mix(in srgb, #000 38%, transparent);
+dsh-plugin-desktop-beta/src/client/launch-presets.tsx:69:    + ' background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 10%, transparent);'
